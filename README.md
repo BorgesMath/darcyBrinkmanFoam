@@ -54,5 +54,5 @@ Um leve aumento na discrepância para maiores \(\Delta P\) pode indicar **efeito
 
 Dentro da pasta do solver:
 ```bash
-wmake
+wclean && wmake
 
