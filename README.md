@@ -9,6 +9,8 @@
 ## Description
 `darcyBrinkmanFoam` é um solver **transiente** para escoamento **incompressível, laminar** de fluidos Newtonianos através de **meios porosos**.
 
+![MOMENTUM-DARCY](Equacoes/MOMENTUM-DARCY.svg)
+
 O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brinkman.
 
 ---
