@@ -16,18 +16,14 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 ## 🔹 Equações Governantes
 
 ### Continuidade
-\[
-\nabla \cdot \vec{U} = 0
-\]
+![continuidade](https://latex.codecogs.com/svg.latex?\nabla\cdot\vec{U}=0)
 
 ### Quantidade de Movimento
-\[
-\frac{\partial \vec{U}}{\partial t}
-+ \nabla \cdot \left( \vec{U} \vec{U} \right)
-- \nabla \cdot \left(\nu \nabla \vec{U} \right)
-+ \frac{\nu}{K} \vec{U}
-= - \nabla p
-\]
+![momento](https://latex.codecogs.com/svg.latex?\frac{\partial\vec{U}}{\partial t}
++\nabla\cdot(\vec{U}\vec{U})
+-\nabla\cdot(\nu\nabla\vec{U})
++\frac{\nu}{K}\vec{U}
+=-\nabla p)
 
 ---
 
@@ -35,10 +31,10 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 
 | Símbolo   | Significado                        |
 |-----------|------------------------------------|
-| \(\vec{U}\) | Velocidade                        |
-| \(p\)       | Pressão                           |
-| \(\nu\)     | Viscosidade cinemática            |
-| \(K\)       | Permeabilidade do meio poroso     |
+| $\vec{U}$ | Velocidade                         |
+| $p$       | Pressão cinemática, $p/\rho$       |
+| $\nu$     | Viscosidade cinemática             |
+| $K$       | Permeabilidade do meio poroso      |
 
 ---
 
@@ -56,3 +52,4 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 Dentro da pasta do solver:
 ```bash
 wmake
+
