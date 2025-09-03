@@ -9,7 +9,7 @@
 ## Description
 `darcyBrinkmanFoam` é um solver **transiente** para escoamento **incompressível, laminar** de fluidos Newtonianos através de **meios porosos**.
 
-![MOMENTUM-DARCY](Equacoes/MOMENTUM-DARCY.svg)
+
 
 O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brinkman.
 
@@ -18,16 +18,13 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 ## 🔹 Equações Governantes
 
 ### Continuidade
-![continuidade](https://latex.codecogs.com/svg.latex?\nabla\cdot\vec{U}=0)
+
+![MOMENTUM-DARCY](Equacoes/CONTINUIDADE.svg)
 
 ### Quantidade de Movimento
-![momento](https://latex.codecogs.com/svg.latex?\frac{\partial\vec{U}}{\partial t}
-+\nabla\cdot(\vec{U}\vec{U})
--\nabla\cdot(\nu\nabla\vec{U})
-+\frac{\nu}{K}\vec{U}
-=-\nabla p)
 
----
+![MOMENTUM-DARCY](Equacoes/MOMENTUM-DARCY.svg)
+
 
 ## 🔹 Notação
 
@@ -40,14 +37,8 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 
 ---
 
-## 🔹 Campos necessários
 
-| Campo  | Descrição                              |
-|--------|----------------------------------------|
-| `U`    | Velocidade \([m/s]\)                   |
-| `p`    | Pressão cinemática, \(p/\rho\) \([m^2/s^2]\) |
-
----
+## Resultado
 
 ## 🚀 Como compilar
 
