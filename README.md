@@ -19,7 +19,7 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 
 ### Continuidade
 
-![MOMENTUM-DARCY](Equacoes/CONTINUIDADE.svg)
+![CONTINUIDADE](Equacoes/CONTINUIDADE.svg)
 
 ### Quantidade de Movimento
 
@@ -39,6 +39,16 @@ O solver utiliza o algoritmo **PISO** para resolver a equação de Darcy–Brink
 
 
 ## Resultado
+
+
+O solver customizado `darcyBrinkmanFoam`, que incorpora o termo de Darcy, foi implementado.  
+Uma análise de **pressão versus vazão** foi conduzida utilizando a malha validada para a geometria simplificada.  
+Utilizamos \(K = 75.6\)\,D.  
+
+Os resultados comparados com a **lei de Darcy** apresentaram erro **< 0.5%**.  
+Um leve aumento na discrepância para maiores \(\Delta P\) pode indicar **efeitos de Brinkman** modestos.
+
+![RESULTADO](Equacoes/imagem_2025-09-03_155524816.png)
 
 ## 🚀 Como compilar
 
