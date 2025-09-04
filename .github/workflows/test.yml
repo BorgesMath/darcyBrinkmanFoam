@@ -1,23 +1,18 @@
 name: CI
 on:
   push:
-    branches: [ main ]   # Gatilho em push na branch main:contentReference[oaicite:0]{index=0}
+    branches: [ main ]   # 
 
 jobs:
   build:
-    runs-on: ubuntu-latest   # Usa Ubuntu GitHub-hosted
+    runs-on: ubuntu-latest   # Runner Linux Ubuntu
     steps:
-      - uses: actions/checkout@v4        # Faz checkout do código:contentReference[oaicite:3]{index=3}
-      - uses: gerlero/setup-openfoam@v1  # Instala versão específica do OpenFOAM:contentReference[oaicite:4]{index=4}
+      - uses: actions/checkout@v4        # Clona o código:contentReference[oaicite:10]{index=10}
+      - uses: gerlero/setup-openfoam@v1  # Prepara OpenFOAM (versão 2506):contentReference[oaicite:11]{index=11}
         with:
-          openfoam-version: 2506        # Versão (exemplo):contentReference[oaicite:5]{index=5}
-      # ... passos seguintes
-
-      - name: Instalar OpenFOAM via apt
+          openfoam-version: 2506
+      - name: Compilar o solver
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openfoam-dev  # Instala OpenFOAM-dev (repositório padrão):contentReference[oaicite:7]{index=7}
-
-        - name: Compilar o solver
-          run: |
-            wmake   # Executa a compilação; se houver erro, o job falha automaticamente
+          # Caso o solver esteja em subdiretório, use cd. Exemplo:
+          # cd applications/solvers/darcyBrinkmanFoam
+          wmake  # Compila o solver (encerra com erro se falhar)
