@@ -1,13 +1,13 @@
-name: Test OpenFOAM build
+name: Test OpenFOAM version
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  test-openfoam:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -16,55 +16,41 @@ jobs:
       - name: Setup OpenFOAM
         uses: gerlero/setup-openfoam@v1
         with:
-          openfoam-version: 2506
+          openfoam-version: '2506'   # ajuste para a versão que você quer testar
 
-      - name: Debug: imprimir variáveis do OpenFOAM e listar lnInclude
+      - name: Print OpenFOAM env and check version
         run: |
-          echo "=== ENV relevantes ==="
-          echo "FOAM_SRC = $FOAM_SRC"
-          echo "FOAM_ETC = $FOAM_ETC"
-          echo "WM_PROJECT = ${WM_PROJECT:-OpenFOAM} (${WM_PROJECT_VERSION:-unknown})"
+          echo "=== ENV OpenFOAM relevantes ==="
+          echo "WM_PROJECT = ${WM_PROJECT:-not-set}"
+          echo "WM_PROJECT_VERSION = ${WM_PROJECT_VERSION:-not-set}"
+          echo "FOAM_PROJECT = ${FOAM_PROJECT:-not-set}"
+          echo "FOAM_SRC = ${FOAM_SRC:-not-set}"
+          echo "FOAM_ETC = ${FOAM_ETC:-not-set}"
+          echo "FOAM_RUN = ${FOAM_RUN:-not-set}"
           echo
-          if [ -d "$FOAM_SRC/OpenFOAM/lnInclude" ]; then
-            echo "### lnInclude existe:"
-            ls -la "$FOAM_SRC/OpenFOAM/lnInclude" | sed -n '1,200p'
-          else
-            echo ">>> $FOAM_SRC/OpenFOAM/lnInclude NÃO existe"
-          fi
-          echo
-          echo "### Procurando por Scalar.H / scalar.h"
-          find "$FOAM_SRC" -type f -name 'Scalar.H' -print || true
-          find "$FOAM_SRC" -type f -iname 'scalar.h' -print || true
-          echo
-          echo "=== Primeiro trecho do solver (se presente) ==="
-          if [ -f "./darcyBrinkmanFoam.C" ]; then
-            sed -n '1,80p' darcyBrinkmanFoam.C || true
-          else
-            echo "Arquivo darcyBrinkmanFoam.C não encontrado no workspace root — verifique o caminho"
-            ls -la
+
+          # carrega bashrc do OpenFOAM se estiver disponível
+          if [ -n "$FOAM_ETC" ] && [ -f "$FOAM_ETC/bashrc" ]; then
+            echo "Sourcing $FOAM_ETC/bashrc"
+            # não falhar se source der problema
+            source "$FOAM_ETC/bashrc" || true
           fi
 
-      - name: (Opcional) Mostrar Make/options e Make/files
-        run: |
-          if [ -d "./Make" ]; then
-            echo "=== Make dir contents ==="
-            ls -la Make || true
-            echo "=== Make/options ==="
-            sed -n "1,200p" Make/options || true
-            echo "=== Make/files ==="
-            sed -n "1,200p" Make/files || true
+          echo
+          echo "=== Tentando comandos de verificação ==="
+          if command -v foamVersion >/dev/null 2>&1; then
+            echo "Comando foamVersion encontrado — saída:"
+            foamVersion || true
+          elif command -v foamInstallationTest >/dev/null 2>&1; then
+            echo "Comando foamInstallationTest encontrado — saída:"
+            foamInstallationTest || true
           else
-            echo "Não há diretório Make/ no repo (ou está em outro local)."
+            echo "Nenhum comando de verificação padrão (foamVersion/foamInstallationTest) disponível."
+            echo "Listando diretórios em \$FOAM_SRC para confirmar instalação:"
+            if [ -n "$FOAM_SRC" ]; then
+              ls -la "$FOAM_SRC" | sed -n '1,200p' || true
+            fi
           fi
 
-      - name: Compilar (wmake) — com ambiente OpenFOAM carregado
-        run: |
-          set -o pipefail
-          if [ -n "$FOAM_ETC" ]; then
-            source "$FOAM_ETC/bashrc"
-          fi
-          # Se o solver estiver em subdiretório, descomente e ajuste:
-          # cd applications/solvers/darcyBrinkmanFoam
-          echo "Current dir: $(pwd)"
-          ls -la
-          wmake
+          echo
+          echo "=== Fim do teste de versão ==="
