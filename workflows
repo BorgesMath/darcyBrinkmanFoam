@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches: [ main ]   # Gatilho em push na branch main:contentReference[oaicite:0]{index=0}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest   # Usa Ubuntu GitHub-hosted
+    steps:
+      - uses: actions/checkout@v4        # Faz checkout do código:contentReference[oaicite:3]{index=3}
+      - uses: gerlero/setup-openfoam@v1  # Instala versão específica do OpenFOAM:contentReference[oaicite:4]{index=4}
+        with:
+          openfoam-version: 2506        # Versão (exemplo):contentReference[oaicite:5]{index=5}
+      # ... passos seguintes
+
+      - name: Instalar OpenFOAM via apt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openfoam-dev  # Instala OpenFOAM-dev (repositório padrão):contentReference[oaicite:7]{index=7}
+
+        - name: Compilar o solver
+          run: |
+            wmake   # Executa a compilação; se houver erro, o job falha automaticamente
