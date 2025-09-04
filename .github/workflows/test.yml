@@ -1,18 +1,95 @@
-name: CI
+name: Build OpenFOAM solver (wmake)
+
 on:
   push:
-    branches: [ main ]   # 
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest   # Runner Linux Ubuntu
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
-      - uses: actions/checkout@v4        # Clona o código:contentReference[oaicite:10]{index=10}
-      - uses: gerlero/setup-openfoam@v1  # Prepara OpenFOAM (versão 2506):contentReference[oaicite:11]{index=11}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup OpenFOAM (instala e configura variáveis)
+        uses: gerlero/setup-openfoam@v1
         with:
+          # ajuste a versão para a que você usa localmente (ex: 2506, 2306, etc.)
           openfoam-version: 2506
-      - name: Compilar o solver
+
+      - name: Debug: imprimir variáveis do OpenFOAM e listar lnInclude
+        # usamos bash -lc para garantir que $FOAM_ETC esteja disponível na mesma shell
         run: |
-          # Caso o solver esteja em subdiretório, use cd. Exemplo:
+          bash -lc '
+          echo "=== ENV relevantes ==="
+          echo "FOAM_SRC = $FOAM_SRC"
+          echo "FOAM_ETC = $FOAM_ETC"
+          echo "FOAM_PROJECT = $WM_PROJECT (${WM_PROJECT_VERSION:-unknown})"
+          echo
+          echo "=== Conteúdo de $FOAM_SRC/OpenFOAM/lnInclude (se existir) ==="
+          if [ -d "$FOAM_SRC/OpenFOAM/lnInclude" ]; then
+            ls -la "$FOAM_SRC/OpenFOAM/lnInclude" | sed -n '1,200p'
+          else
+            echo ">>> $FOAM_SRC/OpenFOAM/lnInclude NÃO existe"
+          fi
+          echo
+          echo "=== Procurando por arquivos Scalar.H (case-sensitive e case-insensitive) ==="
+          find "$FOAM_SRC" -type f -name 'Scalar.H' -print || true
+          find "$FOAM_SRC" -type f -iname 'scalar.h' -print || true
+          echo
+          echo "=== Mostrando primeiros 80 linhas do solver (para checar includes) ==="
+          # ajuste caminho se o solver estiver em subdiretório
+          if [ -f "./darcyBrinkmanFoam.C" ]; then
+            sed -n '1,80p' darcyBrinkmanFoam.C || true
+          elif [ -f "./Make/files" ]; then
+            sed -n '1,80p' darcyBrinkmanFoam.C || true
+          else
+            echo "Arquivo darcyBrinkmanFoam.C não encontrado no workspace root — verifique o caminho"
+            ls -la
+          fi
+          '
+
+      - name: (Opcional) Mostrar Make/options e Make/files
+        run: |
+          bash -lc '
+          if [ -d "./Make" ]; then
+            echo "=== Make dir contents ==="
+            ls -la Make || true
+            echo "=== Make/options ==="
+            sed -n "1,200p" Make/options || true
+            echo "=== Make/files ==="
+            sed -n "1,200p" Make/files || true
+          else
+            echo "Não há diretório Make/ no repo (ou está em outro local)."
+          fi
+          '
+
+      - name: Compilar (wmake) — com ambiente OpenFOAM carregado
+        run: |
+          bash -lc 'set -o pipefail
+          # carrega o ambiente do OpenFOAM (garante variáveis esperadas)
+          if [ -n "$FOAM_ETC" ]; then
+            source "$FOAM_ETC/bashrc"
+          fi
+
+          # Ajuste este cd se seu solver estiver em subdiretório (comentado)
           # cd applications/solvers/darcyBrinkmanFoam
-          wmake  # Compila o solver (encerra com erro se falhar)
+
+          echo "Current dir: $(pwd)"
+          echo "Listing files:"
+          ls -la
+
+          # comando de compilação — wmake falhará com código !=0 se der erro
+          wmake
+          '
+
+      - name: Show build log snippet if exists
+        if: failure()  # roda somente se falhar
+        run: |
+          bash -lc '
+          echo "=== Últimas 200 linhas do log do make (se houver) ==="
+          # se você gerou um log manualmente, ajuste o nome
+          tail -n 200 Make/log || true
+          '
